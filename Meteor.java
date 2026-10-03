@@ -8,7 +8,7 @@ public class Meteor extends Thread {
     private int metY;
     private int vx;
     private int vy;
-    private boolean isAlive;
+    private boolean isAlive = true;
 
     public Meteor(int metX, int metY, int vx, int vy) {
         setX(metX);
@@ -64,6 +64,12 @@ public class Meteor extends Thread {
         while(isAlive){
             setX(metX += getVx());
             setY(metY += getVy());
+
+            if(metX >= 1440 || metY >= 810){
+                vx = -vx;
+                vy = -vy;
+            }
+
             try {
                 Thread.sleep(16);    
             } catch (InterruptedException e) {
