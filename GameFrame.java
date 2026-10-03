@@ -14,9 +14,6 @@ class start {
 
 public class GameFrame extends JFrame {
 
-    public int width = 1440;
-    public int height = 810;
-
     public GameFrame() {
         setSize(1440, 810);
         setTitle("Meteor Strike!!");
@@ -31,8 +28,7 @@ class Panel extends JPanel implements Runnable {
 
     private ArrayList<Meteor> meteor = new ArrayList<>();
     Image bg = Toolkit.getDefaultToolkit().createImage(
-            System.getProperty("user.dir") + File.separator + "img" + File.separator + "background.jpg"
-    );
+            System.getProperty("user.dir") + File.separator + "img" + File.separator + "background.jpg");
 
     public Panel(int met) {
         setSize(1440, 810);
@@ -40,17 +36,23 @@ class Panel extends JPanel implements Runnable {
         for (int i = 0; i < met; i++) {
             x = (int) (Math.random() * 1440);
             y = (int) (Math.random() * 810);
-            vx = (int) (Math.random() * 20) - 10;
-            vy = (int) (Math.random() * 20) - 10;
+            vx = (int) (Math.random() * 2) - 2;
+            vy = (int) (Math.random() * 2) - 2;
             Meteor m = new Meteor(x, y, vx, vy);
             m.start();
             meteor.add(m);
         }
+
+        new Thread(this).start();
     }
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(bg, 0, 0, this);
+        
+        for (Meteor m : meteor) {
+            m.draw(g);
+        }
     }
 
     @Override

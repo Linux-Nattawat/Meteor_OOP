@@ -65,9 +65,11 @@ public class Meteor extends Thread {
             setX(metX += getVx());
             setY(metY += getVy());
 
-            if(metX >= 1440 || metY >= 810){
-                vx = -vx;
-                vy = -vy;
+            if(metX <= 0 || metX >= (1440-100)){ // 1440 - 100 << 100 = ขนาดของรูป
+                vx = (int)(vx * -1.115);
+            }
+            else if (metY <= 0 || metY >= (810-100)){
+                vy = (int)(vy * -1.115);
             }
 
             try {
