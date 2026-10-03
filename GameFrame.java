@@ -1,7 +1,7 @@
 
 import java.awt.*;
 import java.io.*;
-import java.util.*;
+import java.util.concurrent.*;
 import javax.swing.*;
 
 class start {
@@ -26,38 +26,74 @@ public class GameFrame extends JFrame {
 
 class Panel extends JPanel implements Runnable {
 
-    private ArrayList<Meteor> meteor = new ArrayList<>();
-    Image bg = Toolkit.getDefaultToolkit().createImage(
-            System.getProperty("user.dir") + File.separator + "img" + File.separator + "background.jpg");
+    private CopyOnWriteArrayList<Meteor> metArr = new CopyOnWriteArrayList<>();
+    Image bg = new ImageIcon("img/background.jpg").getImage();
 
     public Panel(int met) {
         setSize(1440, 810);
         int x, y, vx, vy;
         for (int i = 0; i < met; i++) {
-            x = (int) (Math.random() * 1440);
-            y = (int) (Math.random() * 810);
-            vx = (int) (Math.random() * 2) - 2;
-            vy = (int) (Math.random() * 2) - 2;
+            x = (int) (Math.random() * (1440 - 130) + 10);
+            y = (int) (Math.random() * (810 - 130) + 10);
+            while (true) {
+                vx = (int) (Math.random() * 6) - 3;
+                vy = (int) (Math.random() * 6) - 3;
+                if (vx != 0 && vy != 0)
+                    break;
+            }
+            // System.out.print(vx+","+vy+"/ ");
+
             Meteor m = new Meteor(x, y, vx, vy);
             m.start();
-            meteor.add(m);
+            metArr.add(m);
         }
 
         new Thread(this).start();
     }
 
+    private void checkCollisions() {
+        for (int i = 0; i < metArr.size(); i++) {
+            for (int j = i + 1; j < metArr.size(); j++) {
+                Meteor m1 = metArr.get(i);
+                Meteor m2 = metArr.get(j);
+
+                int left1 = m1.getX();
+                int right1 = m1.getX() + 72;
+                int top1 = m1.getY();
+                int bottom1 = m1.getY() + 72;
+
+                int left2 = m2.getX();
+                int right2 = m2.getX() + 72;
+                int top2 = m2.getY();
+                int bottom2 = m2.getY() + 72;
+
+                if (right1 >= left2 && left1 <= right2 && bottom1 >= top2 && top1 <= bottom2 && !m1.isExploding() && !m2.isExploding()) {
+                    if (Math.random() < 0.5) {
+                        m1.explode();
+                    } else {
+                        m2.explode();
+                    }
+                }
+                
+            }
+        }
+        metArr.removeIf(m -> !m.getIsAlive());
+
+    }
+
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(bg, 0, 0, this);
-        
-        for (Meteor m : meteor) {
-            m.draw(g);
+
+        for (int i = 0; i < metArr.size(); i++) {
+                metArr.get(i).draw(g);
         }
     }
 
     @Override
     public void run() {
         while (true) {
+            checkCollisions();
             repaint();
             try {
                 Thread.sleep(16);
