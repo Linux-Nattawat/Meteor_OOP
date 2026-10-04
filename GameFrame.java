@@ -1,6 +1,5 @@
 
 import java.awt.*;
-import java.io.*;
 import java.util.concurrent.*;
 import javax.swing.*;
 
@@ -51,7 +50,7 @@ class Panel extends JPanel implements Runnable {
         new Thread(this).start();
     }
 
-    private void checkCollisions() {
+    private void checkPos() {
         for (int i = 0; i < metArr.size(); i++) {
             for (int j = i + 1; j < metArr.size(); j++) {
                 Meteor m1 = metArr.get(i);
@@ -93,7 +92,7 @@ class Panel extends JPanel implements Runnable {
     @Override
     public void run() {
         while (true) {
-            checkCollisions();
+            checkPos();
             repaint();
             try {
                 Thread.sleep(16);
